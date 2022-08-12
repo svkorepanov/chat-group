@@ -10,3 +10,5 @@
 - [Production build](https://www.tomray.dev/nestjs-docker-production)
 
 - [Docker Node Best Practices](https://github.com/nodejs/docker-node/blob/main/docs/BestPractices.md)
+
+- [Nice guied](https://wanago.io/2022/07/25/api-nestjs-database-migrations-typeorm/)
