@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, UpdateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
 import { getUserRepository } from './user.repository';
 
@@ -16,8 +16,13 @@ export class UsersService {
     return this.userRepository.find();
   }
 
-  findOne(id: number): Promise<User> {
-    return this.userRepository.findOneBy({ id });
+  public async findById(id: number): Promise<User> {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new NotFoundException(`user with id: ${id} doesn't exist`);
+    }
+
+    return user;
   }
 
   async findByemail(email: string): Promise<User> {
@@ -28,6 +33,13 @@ export class UsersService {
     }
 
     return user;
+  }
+
+  async updateUser(user: User, fieldsToUpdate: UpdateUserDto): Promise<User> {
+    const newUser = this.userRepository.merge(user, fieldsToUpdate);
+    console.log(newUser);
+
+    return newUser;
   }
 
   async create(userData: CreateUserDto) {

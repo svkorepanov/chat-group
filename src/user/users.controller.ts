@@ -1,10 +1,15 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
-  Post,
+  Patch,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
+import { GetUser } from 'src/authentication/decorators/user-request.decorator';
+import { JwtAuthGuard } from 'src/authentication/guards/jwt-auth.guard';
+import { UpdateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
 
@@ -17,11 +22,19 @@ export class UsersController {
     return this.userService.findAll();
   }
 
-  // @Post()
-  // createUser(@Body('username') username: string): Promise<User> {
-  //   if (!username) {
-  //     throw new BadRequestException();
-  //   }
-  //   return this.userService.createUser(username);
-  // }
+  @Get('/me')
+  @UseGuards(JwtAuthGuard)
+  async getMe(@GetUser() user: User): Promise<User> {
+    return user;
+  }
+
+  @Patch('/me')
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+  async updateMe(
+    @Body() fieldsToUpdate: UpdateUserDto,
+    @GetUser() user: User,
+  ): Promise<User> {
+    return await this.userService.updateUser(user, fieldsToUpdate);
+  }
 }

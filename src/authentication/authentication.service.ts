@@ -10,10 +10,16 @@ import { User } from 'src/user/user.entity';
 import { UsersService } from 'src/user/users.service';
 import { SignUpDto } from './dto/sign-up.dto';
 import { PgErrorCodes } from 'src/constants/postgres';
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from './dto/jwt.dto';
 
 @Injectable()
 export class AuthenticationService {
-  constructor(private usersSerice: UsersService) {}
+  constructor(
+    private readonly usersSerice: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
+
   public async singUp(signUpData: SignUpDto): Promise<User> {
     const hashedPassword = await this.hashPassword(signUpData.password);
 
@@ -31,6 +37,13 @@ export class AuthenticationService {
 
       throw new InternalServerErrorException();
     }
+  }
+
+  public async signIn(user: User): Promise<{ accessToken: string }> {
+    const jwtPayload: JwtPayload = { username: user.name, sub: user.id };
+    const accessToken = this.jwtService.sign(jwtPayload);
+
+    return { accessToken };
   }
 
   public async getAuthenticatedUser(email: string, password: string) {
