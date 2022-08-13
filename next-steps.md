@@ -1,3 +1,3 @@
-- request validation
-- serialization
+- ~~request validation~~
+- ~~serialization~~
 - config module
