@@ -2,6 +2,7 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Delete,
   Get,
   Patch,
   UseGuards,
@@ -39,5 +40,11 @@ export class UsersController {
     @GetUser() user: User,
   ): Promise<User> {
     return await this.userService.updateUser(user, fieldsToUpdate);
+  }
+
+  @Delete('/me')
+  @UseGuards(JwtAuthGuard)
+  async deleteMe(@GetUser() user: User): Promise<User> {
+    return await this.userService.deleteUser(user);
   }
 }

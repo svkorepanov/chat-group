@@ -19,7 +19,7 @@ export class UsersService {
   public async findById(id: number): Promise<User> {
     const user = await this.userRepository.findOneBy({ id });
     if (!user) {
-      throw new NotFoundException(`user with id: ${id} doesn't exist`);
+      throw new NotFoundException(`User not found`);
     }
 
     return user;
@@ -49,5 +49,9 @@ export class UsersService {
     });
     await this.userRepository.save(newUser);
     return newUser;
+  }
+
+  async deleteUser(user: User) {
+    return await this.userRepository.softRemove(user);
   }
 }
