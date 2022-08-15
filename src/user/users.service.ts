@@ -37,7 +37,7 @@ export class UsersService {
 
   async updateUser(user: User, fieldsToUpdate: UpdateUserDto): Promise<User> {
     const newUser = this.userRepository.merge(user, fieldsToUpdate);
-    console.log(newUser);
+    await this.userRepository.save(newUser);
 
     return newUser;
   }

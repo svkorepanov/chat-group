@@ -1,9 +1,11 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   HttpCode,
   Post,
   UseGuards,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -19,6 +21,7 @@ export class AuthenticationController {
 
   @Post('signup')
   @UsePipes(ValidationPipe)
+  @UseInterceptors(ClassSerializerInterceptor)
   async signUp(@Body() signUpData: SignUpDto): Promise<User> {
     return this.authService.singUp(signUpData);
   }
