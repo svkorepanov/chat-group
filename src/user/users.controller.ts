@@ -4,6 +4,8 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
+  ParseIntPipe,
   Patch,
   UseGuards,
   UseInterceptors,
@@ -26,13 +28,19 @@ export class UsersController {
     return this.userService.findAll();
   }
 
-  @Get('/me')
+  @Get('me')
   @UseGuards(JwtAuthGuard)
   async getMe(@GetUser() user: User): Promise<User> {
     return user;
   }
 
-  @Patch('/me')
+  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  async getUser(@Param('id', ParseIntPipe) id: number): Promise<User> {
+    return await this.userService.findById(id);
+  }
+
+  @Patch('me')
   @UseGuards(JwtAuthGuard)
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
   async updateMe(
@@ -42,7 +50,7 @@ export class UsersController {
     return await this.userService.updateUser(user, fieldsToUpdate);
   }
 
-  @Delete('/me')
+  @Delete('me')
   @UseGuards(JwtAuthGuard)
   async deleteMe(@GetUser() user: User): Promise<User> {
     return await this.userService.deleteUser(user);

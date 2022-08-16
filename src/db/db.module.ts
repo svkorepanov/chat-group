@@ -17,6 +17,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         entities: [__dirname + '/../**/*.entity.{js,ts}'],
         migrations: [__dirname + '/migrations/*.{js,ts}'],
         synchronize: configService.get('PG_SYNC'),
+        logging: ['error', 'warn'],
       }),
     }),
   ],

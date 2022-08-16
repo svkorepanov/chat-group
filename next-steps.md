@@ -1,3 +1,7 @@
 - ~~request validation~~
 - ~~serialization~~
-- config module
+- ~~config module~~
+- ~~log all exeptions properly (signUp)~~
+- ~~create users/:id controller~~
+- create Chat entity
+- create Message entity

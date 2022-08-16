@@ -12,8 +12,8 @@ export class UsersService {
     this.userRepository = getUserRepository(this.dataSource);
   }
 
-  findAll(): Promise<User[]> {
-    return this.userRepository.find();
+  async findAll(): Promise<User[]> {
+    return await this.userRepository.find();
   }
 
   public async findById(id: number): Promise<User> {
