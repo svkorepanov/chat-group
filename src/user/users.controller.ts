@@ -15,7 +15,7 @@ import {
 import { GetUser } from 'src/authentication/decorators/user-request.decorator';
 import { JwtAuthGuard } from 'src/authentication/guards/jwt-auth.guard';
 import { UpdateUserDto } from './dto/create-user.dto';
-import { User } from './user.entity';
+import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 
 @UseInterceptors(ClassSerializerInterceptor)

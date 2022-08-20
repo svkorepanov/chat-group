@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { compare, genSalt, hash } from 'bcrypt';
-import { User } from 'src/user/user.entity';
+import { User } from 'src/user/entities/user.entity';
 import { UsersService } from 'src/user/users.service';
 import { SignUpDto } from './dto/sign-up.dto';
 import { PgErrorCodes } from 'src/constants/postgres';

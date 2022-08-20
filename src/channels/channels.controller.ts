@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { GetUser } from 'src/authentication/decorators/user-request.decorator';
 import { JwtAuthGuard } from 'src/authentication/guards/jwt-auth.guard';
-import { User } from 'src/user/user.entity';
+import { User } from 'src/user/entities/user.entity';
 import { ChannelsService } from './channels.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { UpdateChannelDto } from './dto/update-channel.dto';
