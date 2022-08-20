@@ -12,7 +12,10 @@ export class UsersService {
   }
 
   public async findById(id: number): Promise<User> {
-    const user = await this.userRepository.findOneBy({ id });
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: { memberOfChannels: true },
+    });
     if (!user) {
       throw new NotFoundException(`User not found`);
     }
@@ -20,7 +23,7 @@ export class UsersService {
     return user;
   }
 
-  async findByemail(email: string): Promise<User> {
+  async findByEmail(email: string): Promise<User> {
     const user = await this.userRepository.findOneBy({ email });
 
     if (!user) {

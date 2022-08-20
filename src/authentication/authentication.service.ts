@@ -48,7 +48,7 @@ export class AuthenticationService {
 
   public async getAuthenticatedUser(email: string, password: string) {
     try {
-      const user = await this.usersSerice.findByemail(email);
+      const user = await this.usersSerice.findByEmail(email);
       await this.verifyPassword(password, user.password);
       return user;
     } catch (error) {

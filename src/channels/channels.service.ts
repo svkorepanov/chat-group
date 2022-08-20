@@ -14,12 +14,13 @@ export class ChannelsService {
   constructor(private channelRepository: ChannelRepository) {}
 
   async create(
-    user: User,
+    owner: User,
     createChannelDto: CreateChannelDto,
   ): Promise<Channel> {
     const newChannel = this.channelRepository.create({
       ...createChannelDto,
-      owner: user,
+      owner,
+      members: [owner],
     });
 
     return await this.channelRepository.saveChannel(newChannel);

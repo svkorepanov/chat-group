@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -47,4 +48,9 @@ export class User {
 
   @OneToMany(() => Channel, (channel) => channel.owner, { onDelete: 'CASCADE' })
   ownerOfChannels: Channel[];
+
+  @ManyToMany(() => Channel, (channel) => channel.members, {
+    onDelete: 'NO ACTION',
+  })
+  memberOfChannels: Channel[];
 }

@@ -6,6 +6,8 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -37,10 +39,27 @@ export class Channel {
   deletedAt: Date;
 
   @ManyToOne(() => User, (user) => user.ownerOfChannels, {
-    cascade: true,
+    cascade: ['insert', 'update'],
     onDelete: 'NO ACTION',
     nullable: false,
   })
   @JoinColumn({ name: 'ownerId', referencedColumnName: 'id' })
   owner: User;
+
+  @ManyToMany(() => User, (user) => user.memberOfChannels, {
+    cascade: ['insert', 'update'],
+    onDelete: 'NO ACTION',
+  })
+  @JoinTable({
+    name: 'channelMembers',
+    joinColumn: {
+      name: 'channelId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'userId',
+      referencedColumnName: 'id',
+    },
+  })
+  members: User[];
 }
