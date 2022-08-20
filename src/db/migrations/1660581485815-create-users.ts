@@ -2,7 +2,7 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class createUsers1660581485815 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    queryRunner.query(`
+    await queryRunner.query(`
       CREATE TABLE "users" (
           "id" serial PRIMARY KEY,
           "email" VARCHAR(100) UNIQUE NOT NULL,
@@ -22,7 +22,7 @@ export class createUsers1660581485815 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    queryRunner.query(`
+    await queryRunner.query(`
       DROP TABLE "users";
     `);
   }

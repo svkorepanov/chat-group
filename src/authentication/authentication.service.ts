@@ -31,7 +31,7 @@ export class AuthenticationService {
     } catch (error) {
       if (error?.code === PgErrorCodes.UniqueViolation) {
         throw new ConflictException(
-          `User with email: ${signUpData.email} alread exists`,
+          `User with email '${signUpData.email}' alread exists`,
         );
       }
 

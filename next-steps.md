@@ -3,5 +3,9 @@
 - ~~config module~~
 - ~~log all exeptions properly (signUp)~~
 - ~~create users/:id controller~~
-- create Chat entity
+- create Channel entity
+  - ~~create custome repository and extend method save to reuse Uniques contraints handling~~
+  - add authorization to update
+- add memebers to channel
+  - add join endpoint
 - create Message entity

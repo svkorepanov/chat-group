@@ -1,9 +1,11 @@
 import { Exclude } from 'class-transformer';
+import { Channel } from 'src/channels/entities/channel.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   VersionColumn,
@@ -42,4 +44,7 @@ export class User {
   @Exclude()
   @DeleteDateColumn()
   deletedAt: Date;
+
+  @OneToMany(() => Channel, (channel) => channel.owner, { onDelete: 'CASCADE' })
+  ownerOfChannels: Channel[];
 }
