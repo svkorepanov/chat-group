@@ -9,7 +9,7 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { User } from 'src/user/entities/user.entity';
+import { User } from '../user/entities/user.entity';
 import { AuthenticationService } from './authentication.service';
 import { GetUser } from './decorators/user-request.decorator';
 import { SignUpDto } from './dto/sign-up.dto';

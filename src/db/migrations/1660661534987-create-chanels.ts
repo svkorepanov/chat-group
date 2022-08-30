@@ -9,19 +9,19 @@ export class createChanels1660661534987 implements MigrationInterface {
         "description" varchar(240),
         "ownerId" integer NOT NULL,
         "createdAt" TIMESTAMP DEFAULT now() NOT NULL,
-          "updatedAt" TIMESTAMP DEFAULT now() NOT NULL,
-          "deletedAt" TIMESTAMP,
-          "version" INTEGER DEFAULT 0 NOT NULL,
-          FOREIGN KEY ("ownerId") REFERENCES "users" ("id")
+        "updatedAt" TIMESTAMP DEFAULT now() NOT NULL,
+        "deletedAt" TIMESTAMP,
+        "version" INTEGER DEFAULT 0 NOT NULL,
+        FOREIGN KEY ("ownerId") REFERENCES "users" ("id")
       );
 
-      CREATE TABLE "chanelMembers" (
+      CREATE TABLE "channelMembers" (
         "userId" integer,
         "channelId" integer,
         "createdAt" TIMESTAMP DEFAULT now() NOT NULL,
-          "updatedAt" TIMESTAMP DEFAULT now() NOT NULL,
-          "deletedAt" TIMESTAMP,
-          "version" INTEGER DEFAULT 0 NOT NULL,
+        "updatedAt" TIMESTAMP DEFAULT now() NOT NULL,
+        "deletedAt" TIMESTAMP,
+        "version" INTEGER DEFAULT 0 NOT NULL,
         PRIMARY KEY ("userId", "channelId"),
         FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE,
         FOREIGN KEY ("channelId") REFERENCES "channels" ("id") ON DELETE CASCADE

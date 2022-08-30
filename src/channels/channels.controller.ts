@@ -13,9 +13,12 @@ import {
   UseInterceptors,
   ParseIntPipe,
 } from '@nestjs/common';
-import { GetUser } from 'src/authentication/decorators/user-request.decorator';
-import { JwtAuthGuard } from 'src/authentication/guards/jwt-auth.guard';
-import { User } from 'src/user/entities/user.entity';
+import { GetUser } from '../authentication/decorators/user-request.decorator';
+import { JwtAuthGuard } from '../authentication/guards/jwt-auth.guard';
+import { CreateMessageDto } from '../messages/dto/create-message.dto';
+import { Message } from '../messages/entities/message.entity';
+import { MessagesService } from '../messages/messages.service';
+import { User } from '../user/entities/user.entity';
 import { ChannelsService } from './channels.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { UpdateChannelDto } from './dto/update-channel.dto';
@@ -26,12 +29,10 @@ import { Channel } from './entities/channel.entity';
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @UseInterceptors(ClassSerializerInterceptor)
 export class ChannelsController {
-  constructor(private readonly channelsService: ChannelsService) {}
-
-  @Post()
-  create(@Body() createChannelDto: CreateChannelDto, @GetUser() user: User) {
-    return this.channelsService.create(user, createChannelDto);
-  }
+  constructor(
+    private readonly channelsService: ChannelsService,
+    private messagesService: MessagesService,
+  ) {}
 
   @Get()
   async findAll(): Promise<Channel[]> {
@@ -40,7 +41,22 @@ export class ChannelsController {
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.channelsService.findOne(id);
+    return this.channelsService.findOne(id, true);
+  }
+
+  @Post()
+  create(@Body() createChannelDto: CreateChannelDto, @GetUser() user: User) {
+    return this.channelsService.create(user, createChannelDto);
+  }
+
+  @Post(':id/join')
+  joinChannel(@Param('id', ParseIntPipe) id: number, @GetUser() user: User) {
+    return this.channelsService.join(id, user);
+  }
+
+  @Post(':id/leave')
+  leaveChannel(@Param('id', ParseIntPipe) id: number, @GetUser() user: User) {
+    return this.channelsService.leave(id, user);
   }
 
   @Patch(':id')
@@ -55,5 +71,25 @@ export class ChannelsController {
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number, @GetUser() user: User) {
     return this.channelsService.remove(id, user);
+  }
+
+  @Post(':id/messages')
+  async createMessage(
+    @GetUser() { id: userId }: User,
+    @Param('id', ParseIntPipe) channelId: number,
+    @Body() createMessageDto: CreateMessageDto,
+  ): Promise<Message> {
+    return await this.messagesService.create(
+      createMessageDto,
+      channelId,
+      userId,
+    );
+  }
+
+  @Get(':id/messages')
+  async findAllMessages(
+    @Param('id', ParseIntPipe) channelId: number,
+  ): Promise<Message[]> {
+    return await this.messagesService.findAll(channelId);
   }
 }

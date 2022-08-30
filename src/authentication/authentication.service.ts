@@ -6,12 +6,12 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { compare, genSalt, hash } from 'bcrypt';
-import { User } from 'src/user/entities/user.entity';
-import { UsersService } from 'src/user/users.service';
 import { SignUpDto } from './dto/sign-up.dto';
-import { PgErrorCodes } from 'src/constants/postgres';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './dto/jwt.dto';
+import { PgErrorCodes } from '../constants/postgres';
+import { User } from '../user/entities/user.entity';
+import { UsersService } from '../user/users.service';
 
 @Injectable()
 export class AuthenticationService {

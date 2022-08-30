@@ -3,8 +3,8 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { PgErrorCodes } from 'src/constants/postgres';
 import { DataSource, DeepPartial, Repository } from 'typeorm';
+import { PgErrorCodes } from '../../constants/postgres';
 import { Channel } from './channel.entity';
 
 @Injectable()

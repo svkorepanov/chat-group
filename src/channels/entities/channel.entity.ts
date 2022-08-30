@@ -1,18 +1,19 @@
 import { Exclude } from 'class-transformer';
-import { User } from 'src/user/entities/user.entity';
+import { Message } from '../../messages/entities/message.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
   JoinColumn,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   VersionColumn,
 } from 'typeorm';
+import { ChannelMembers } from './channel-members.entity';
+import { User } from '../../user/entities/user.entity';
 
 @Entity({ name: 'channels' })
 export class Channel {
@@ -46,20 +47,9 @@ export class Channel {
   @JoinColumn({ name: 'ownerId', referencedColumnName: 'id' })
   owner: User;
 
-  @ManyToMany(() => User, (user) => user.memberOfChannels, {
-    cascade: ['insert', 'update'],
-    onDelete: 'NO ACTION',
-  })
-  @JoinTable({
-    name: 'channelMembers',
-    joinColumn: {
-      name: 'channelId',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'userId',
-      referencedColumnName: 'id',
-    },
-  })
-  members: User[];
+  @OneToMany(() => ChannelMembers, (channelMembers) => channelMembers.channel)
+  members: ChannelMembers[];
+
+  @OneToMany(() => Message, (message) => message.channel)
+  messages: Message[];
 }

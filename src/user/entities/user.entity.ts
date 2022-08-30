@@ -1,16 +1,16 @@
 import { Exclude } from 'class-transformer';
-import { Channel } from 'src/channels/entities/channel.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   VersionColumn,
 } from 'typeorm';
+import { ChannelMembers } from '../../channels/entities/channel-members.entity';
+import { Channel } from '../../channels/entities/channel.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -49,8 +49,6 @@ export class User {
   @OneToMany(() => Channel, (channel) => channel.owner, { onDelete: 'CASCADE' })
   ownerOfChannels: Channel[];
 
-  @ManyToMany(() => Channel, (channel) => channel.members, {
-    onDelete: 'NO ACTION',
-  })
-  memberOfChannels: Channel[];
+  @OneToMany(() => ChannelMembers, (channelMembers) => channelMembers.member)
+  memberOfChannels: ChannelMembers[];
 }
