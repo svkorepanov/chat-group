@@ -7,6 +7,7 @@ import { ChannelRepository } from './entities/channel.repository';
 import { ChannelMembers } from './entities/channel-members.entity';
 import { ChannelMembersRepository } from './entities/channel-members.repository';
 import { MessagesModule } from '../messages/messages.module';
+import { ChannelsGateway } from './channels.gateway';
 
 @Module({
   imports: [
@@ -14,6 +15,11 @@ import { MessagesModule } from '../messages/messages.module';
     MessagesModule,
   ],
   controllers: [ChannelsController],
-  providers: [ChannelsService, ChannelRepository, ChannelMembersRepository],
+  providers: [
+    ChannelsService,
+    ChannelRepository,
+    ChannelMembersRepository,
+    ChannelsGateway,
+  ],
 })
 export class ChannelsModule {}
