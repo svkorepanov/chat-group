@@ -12,11 +12,14 @@ import { JwtPayload } from './dto/jwt.dto';
 import { PgErrorCodes } from '../constants/postgres';
 import { User } from '../user/entities/user.entity';
 import { UsersService } from '../user/users.service';
+import { Socket } from 'socket.io';
+
+type SocketMiddleware = (socket: Socket, next: (err?: Error) => void) => void;
 
 @Injectable()
 export class AuthenticationService {
   constructor(
-    private readonly usersSerice: UsersService,
+    private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -24,7 +27,7 @@ export class AuthenticationService {
     const hashedPassword = await this.hashPassword(signUpData.password);
 
     try {
-      return await this.usersSerice.create({
+      return await this.usersService.create({
         ...signUpData,
         password: hashedPassword,
       });
@@ -48,7 +51,7 @@ export class AuthenticationService {
 
   public async getAuthenticatedUser(email: string, password: string) {
     try {
-      const user = await this.usersSerice.findByEmail(email);
+      const user = await this.usersService.findByEmail(email);
       await this.verifyPassword(password, user.password);
       return user;
     } catch (error) {
@@ -61,6 +64,31 @@ export class AuthenticationService {
 
       throw new InternalServerErrorException();
     }
+  }
+
+  public getWsAuthMiddleware(): SocketMiddleware {
+    return async (socket, next) => {
+      const token = this.extractJwtFromSocket(socket);
+      if (!token) {
+        return next(new UnauthorizedException());
+      }
+
+      try {
+        const { sub } = await this.jwtService.verifyAsync<JwtPayload>(token);
+        await this.usersService.findById(sub);
+      } catch {
+        return next(new UnauthorizedException());
+      }
+      next();
+    };
+  }
+
+  private extractJwtFromSocket(socket: Socket) {
+    const authHeader = socket.handshake.headers?.authorization || '';
+
+    const [, token] = authHeader.split(' ');
+
+    return token;
   }
 
   private async hashPassword(password: string): Promise<string> {

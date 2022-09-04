@@ -7,12 +7,14 @@ import { ChannelRepository } from './entities/channel.repository';
 import { ChannelMembers } from './entities/channel-members.entity';
 import { ChannelMembersRepository } from './entities/channel-members.repository';
 import { MessagesModule } from '../messages/messages.module';
-import { ChannelsGateway } from './channels.gateway';
+import { ChannelsGateway } from './ws-gateway/channels.gateway';
+import { AuthenticationModule } from '../authentication/authentication.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Channel, ChannelMembers]),
     MessagesModule,
+    AuthenticationModule,
   ],
   controllers: [ChannelsController],
   providers: [
