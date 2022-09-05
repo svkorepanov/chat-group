@@ -9,12 +9,14 @@ import { ChannelMembersRepository } from './entities/channel-members.repository'
 import { MessagesModule } from '../messages/messages.module';
 import { ChannelsGateway } from './ws-gateway/channels.gateway';
 import { AuthenticationModule } from '../authentication/authentication.module';
+import { UsersModule } from '../user/users.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Channel, ChannelMembers]),
     MessagesModule,
     AuthenticationModule,
+    UsersModule,
   ],
   controllers: [ChannelsController],
   providers: [
@@ -23,5 +25,6 @@ import { AuthenticationModule } from '../authentication/authentication.module';
     ChannelMembersRepository,
     ChannelsGateway,
   ],
+  exports: [ChannelRepository],
 })
 export class ChannelsModule {}

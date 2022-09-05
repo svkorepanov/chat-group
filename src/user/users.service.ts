@@ -22,6 +22,18 @@ export class UsersService {
     return user;
   }
 
+  public async findUserChannels(id: number) {
+    const userWithChannels = await this.userRepository.findOne({
+      select: { memberOfChannels: { channelId: true } },
+      where: { id },
+      relations: {
+        memberOfChannels: true,
+      },
+    });
+
+    return userWithChannels.memberOfChannels;
+  }
+
   async findByEmail(email: string): Promise<User> {
     const user = await this.userRepository.findOneBy({ email });
 

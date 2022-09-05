@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CreateMessageDto } from './dto/create-message.dto';
-import { UpdateMessageDto } from './dto/update-message.dto';
 import { Message } from './entities/message.entity';
 import { MessageRepository } from './entities/message.repository';
 
@@ -10,11 +9,11 @@ export class MessagesService {
 
   async create(
     createMessageDto: CreateMessageDto,
-    channelId: number,
     userId: number,
   ): Promise<Message> {
+    const { text, channelId } = createMessageDto;
     const newMessage = this.messageRepository.create({
-      ...createMessageDto,
+      text,
       channel: { id: channelId },
       user: { id: userId },
     });
@@ -29,11 +28,7 @@ export class MessagesService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} message`;
-  }
-
-  update(id: number, updateMessageDto: UpdateMessageDto) {
+  update(id: number) {
     return `This action updates a #${id} message`;
   }
 

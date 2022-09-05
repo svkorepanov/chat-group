@@ -1,6 +1,6 @@
 import { IsString, IsNotEmpty, MaxLength, IsNumber } from 'class-validator';
 
-export class CreateMessageDto {
+export class CreateChannelMessageDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(10000)

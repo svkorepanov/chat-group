@@ -18,13 +18,19 @@
   - [websocket with postman](https://blog.postman.com/postman-now-supports-socket-io/)
   - ~~create socket connection~~
   - ~~authentication~~
-  - create **chanell** messaging
+  - ~~create **chanell** messaging~~
 
 - logging
 
+- write tests (ACL, Deletion)
+
+- add message editing
+
 - add authorization for (channel deletion, message editing)
 
-- write tests (ACL, Deletion)
+- create front end
+
+- deploy
 
 - create **private** messaging
 

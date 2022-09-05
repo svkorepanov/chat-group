@@ -13,8 +13,12 @@ import { PgErrorCodes } from '../constants/postgres';
 import { User } from '../user/entities/user.entity';
 import { UsersService } from '../user/users.service';
 import { Socket } from 'socket.io';
+import { ChannelSocket } from '../channels/interfaces/socket.interface';
 
-type SocketMiddleware = (socket: Socket, next: (err?: Error) => void) => void;
+type SocketMiddleware = (
+  socket: ChannelSocket,
+  next: (err?: Error) => void,
+) => void;
 
 @Injectable()
 export class AuthenticationService {
@@ -75,7 +79,8 @@ export class AuthenticationService {
 
       try {
         const { sub } = await this.jwtService.verifyAsync<JwtPayload>(token);
-        await this.usersService.findById(sub);
+        const user = await this.usersService.findById(sub);
+        socket.data.user = user;
       } catch {
         return next(new UnauthorizedException());
       }

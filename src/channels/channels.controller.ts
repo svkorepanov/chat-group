@@ -15,7 +15,6 @@ import {
 } from '@nestjs/common';
 import { GetUser } from '../authentication/decorators/user-request.decorator';
 import { JwtAuthGuard } from '../authentication/guards/jwt-auth.guard';
-import { CreateMessageDto } from '../messages/dto/create-message.dto';
 import { Message } from '../messages/entities/message.entity';
 import { MessagesService } from '../messages/messages.service';
 import { User } from '../user/entities/user.entity';
@@ -71,19 +70,6 @@ export class ChannelsController {
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number, @GetUser() user: User) {
     return this.channelsService.remove(id, user);
-  }
-
-  @Post(':id/messages')
-  async createMessage(
-    @GetUser() { id: userId }: User,
-    @Param('id', ParseIntPipe) channelId: number,
-    @Body() createMessageDto: CreateMessageDto,
-  ): Promise<Message> {
-    return await this.messagesService.create(
-      createMessageDto,
-      channelId,
-      userId,
-    );
   }
 
   @Get(':id/messages')

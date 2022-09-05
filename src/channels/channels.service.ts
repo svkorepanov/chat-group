@@ -3,7 +3,9 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { MessagesService } from '../messages/messages.service';
 import { User } from '../user/entities/user.entity';
+import { CreateChannelMessageDto } from './dto/create-channel-message.dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { UpdateChannelDto } from './dto/update-channel.dto';
 import { ChannelMembersRepository } from './entities/channel-members.repository';
@@ -15,6 +17,7 @@ export class ChannelsService {
   constructor(
     private channelRepository: ChannelRepository,
     private channelMembersRepository: ChannelMembersRepository,
+    private messagesService: MessagesService,
   ) {}
 
   async findAll(): Promise<Channel[]> {
@@ -66,6 +69,28 @@ export class ChannelsService {
     });
 
     return newChannelInstance;
+  }
+
+  async createMessage(
+    createMessageDto: CreateChannelMessageDto,
+    userId: number,
+  ) {
+    const { channelId } = createMessageDto;
+    const channel = await this.channelRepository.findOne({
+      where: {
+        id: channelId,
+        members: { userId },
+      },
+      relations: {
+        members: true,
+      },
+    });
+
+    if (!channel) {
+      throw new NotFoundException(`There is no channel with id :${channelId}`);
+    }
+
+    return await this.messagesService.create(createMessageDto, userId);
   }
 
   async update(
