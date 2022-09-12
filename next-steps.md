@@ -21,6 +21,10 @@
   - ~~create **chanell** messaging~~
 
 - logging
+  - user module
+  - auth module
+  - channel module
+  - message module
 
 - write tests (ACL, Deletion)
 
@@ -33,6 +37,10 @@
 - deploy
 
 - create **private** messaging
+
+- create private channels
+
+- add avatars
 
 
 

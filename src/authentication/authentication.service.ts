@@ -1,7 +1,7 @@
 import {
-  ConflictException,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -9,7 +9,6 @@ import { compare, genSalt, hash } from 'bcrypt';
 import { SignUpDto } from './dto/sign-up.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './dto/jwt.dto';
-import { PgErrorCodes } from '../constants/postgres';
 import { User } from '../user/entities/user.entity';
 import { UsersService } from '../user/users.service';
 import { Socket } from 'socket.io';
@@ -27,23 +26,15 @@ export class AuthenticationService {
     private readonly jwtService: JwtService,
   ) {}
 
+  private readonly loger = new Logger(AuthenticationService.name);
+
   public async singUp(signUpData: SignUpDto): Promise<User> {
     const hashedPassword = await this.hashPassword(signUpData.password);
 
-    try {
-      return await this.usersService.create({
-        ...signUpData,
-        password: hashedPassword,
-      });
-    } catch (error) {
-      if (error?.code === PgErrorCodes.UniqueViolation) {
-        throw new ConflictException(
-          `User with email '${signUpData.email}' alread exists`,
-        );
-      }
-
-      throw new InternalServerErrorException();
-    }
+    return await this.usersService.create({
+      ...signUpData,
+      password: hashedPassword,
+    });
   }
 
   public async signIn(user: User): Promise<{ accessToken: string }> {
@@ -63,9 +54,11 @@ export class AuthenticationService {
         error instanceof NotFoundException ||
         error instanceof UnauthorizedException
       ) {
+        this.loger.error(`Unauthrozied access atempt ${email}`, error.stack);
         throw new UnauthorizedException();
       }
 
+      this.loger.error(`Unauthrozied access atempt ${email}`, error.stack);
       throw new InternalServerErrorException();
     }
   }
@@ -81,7 +74,11 @@ export class AuthenticationService {
         const { sub } = await this.jwtService.verifyAsync<JwtPayload>(token);
         const user = await this.usersService.findById(sub);
         socket.data.user = user;
-      } catch {
+      } catch (error) {
+        this.loger.error(
+          `Unauthrozied Socket connection atempt. UserId ${socket.id}`,
+          error.stack,
+        );
         return next(new UnauthorizedException());
       }
       next();

@@ -1,8 +1,10 @@
 import {
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { DataSource } from 'typeorm';
 import { MessagesService } from '../messages/messages.service';
 import { User } from '../user/entities/user.entity';
 import { CreateChannelMessageDto } from './dto/create-channel-message.dto';
@@ -18,7 +20,10 @@ export class ChannelsService {
     private channelRepository: ChannelRepository,
     private channelMembersRepository: ChannelMembersRepository,
     private messagesService: MessagesService,
+    private dataSource: DataSource,
   ) {}
+
+  private readonly logger = new Logger(ChannelsService.name);
 
   async findAll(): Promise<Channel[]> {
     return await this.channelRepository.find({ relations: { owner: true } });
@@ -42,6 +47,7 @@ export class ChannelsService {
       userId: user.id,
       channelId: id,
     });
+    this.logger.log(`User ${user.id} has joined channel ${id}`);
   }
 
   async leave(id: number, user: User): Promise<void> {
@@ -49,6 +55,7 @@ export class ChannelsService {
       userId: user.id,
       channelId: id,
     });
+    this.logger.log(`User ${user.id} has left channel ${id}`);
   }
 
   async create(
@@ -60,6 +67,7 @@ export class ChannelsService {
       owner,
     });
 
+    // TODO: user transaction here
     const newChannelInstance = await this.channelRepository.saveChannel(
       newChannel,
     );
@@ -67,6 +75,10 @@ export class ChannelsService {
       channelId: newChannelInstance.id,
       userId: owner.id,
     });
+
+    this.logger.log(
+      `User ${owner.id} has created channel ${newChannelInstance.id}`,
+    );
 
     return newChannelInstance;
   }

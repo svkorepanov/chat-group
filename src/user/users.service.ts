@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
+import { PgErrorCodes } from '../constants/postgres';
 import { CreateUserDto, UpdateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 import { UserRepository } from './entities/user.repository';
@@ -6,6 +12,7 @@ import { UserRepository } from './entities/user.repository';
 @Injectable()
 export class UsersService {
   constructor(private userRepository: UserRepository) {}
+  private readonly logger = new Logger(UsersService.name);
 
   async findAll(): Promise<User[]> {
     return await this.userRepository.find();
@@ -16,6 +23,7 @@ export class UsersService {
       where: { id },
     });
     if (!user) {
+      this.logger.error(`User ${id} not found`);
       throw new NotFoundException(`User not found`);
     }
 
@@ -38,6 +46,7 @@ export class UsersService {
     const user = await this.userRepository.findOneBy({ email });
 
     if (!user) {
+      this.logger.error(`User ${email} not found`);
       throw new NotFoundException(`User with ${email} does not exist`);
     }
 
@@ -56,11 +65,24 @@ export class UsersService {
       ...userData,
       name: userData.email,
     });
-    await this.userRepository.save(newUser);
-    return newUser;
+    try {
+      return await this.userRepository.save(newUser);
+    } catch (error) {
+      if (error?.code === PgErrorCodes.UniqueViolation) {
+        this.logger.error(`User with email '${userData.email}' alread exists`);
+        throw new ConflictException(
+          `User with email '${userData.email}' alread exists`,
+        );
+      }
+
+      throw error;
+    }
   }
 
   async deleteUser(user: User) {
-    return await this.userRepository.softRemove(user);
+    const deletedUser = await this.userRepository.softRemove(user);
+    this.logger.log(`User ${user.id} has been deleted`);
+
+    return deletedUser;
   }
 }
