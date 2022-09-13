@@ -67,20 +67,31 @@ export class ChannelsService {
       owner,
     });
 
-    // TODO: user transaction here
-    const newChannelInstance = await this.channelRepository.saveChannel(
-      newChannel,
-    );
-    await this.channelMembersRepository.save({
-      channelId: newChannelInstance.id,
-      userId: owner.id,
-    });
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const newChannelInstance = await this.channelRepository.saveChannel(
+        newChannel,
+        queryRunner.manager,
+      );
+      const channelMemebers = this.channelMembersRepository.create({
+        channelId: newChannelInstance.id,
+        userId: owner.id,
+      });
+      await queryRunner.manager.save(channelMemebers);
+      await queryRunner.commitTransaction();
 
-    this.logger.log(
-      `User ${owner.id} has created channel ${newChannelInstance.id}`,
-    );
+      this.logger.log(
+        `User ${owner.id} has created channel ${newChannelInstance.id}`,
+      );
 
-    return newChannelInstance;
+      return newChannelInstance;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async createMessage(

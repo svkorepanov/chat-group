@@ -3,7 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { DataSource, DeepPartial, Repository } from 'typeorm';
+import { DataSource, DeepPartial, EntityManager, Repository } from 'typeorm';
 import { PgErrorCodes } from '../../constants/postgres';
 import { Channel } from './channel.entity';
 
@@ -13,9 +13,13 @@ export class ChannelRepository extends Repository<Channel> {
     super(Channel, dataSource.createEntityManager());
   }
 
-  async saveChannel(entity: DeepPartial<Channel>) {
+  async saveChannel(entity: DeepPartial<Channel>, transaction?: EntityManager) {
     try {
-      return await this.save(entity);
+      const channel = this.create(entity);
+      if (transaction) {
+        return await transaction.save(channel);
+      }
+      return await this.save(channel);
     } catch (error) {
       if (error?.code === PgErrorCodes.UniqueViolation) {
         throw new ConflictException(
