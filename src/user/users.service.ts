@@ -14,7 +14,7 @@ export class UsersService {
   constructor(private userRepository: UserRepository) {}
   private readonly logger = new Logger(UsersService.name);
 
-  async findAll(): Promise<User[]> {
+  public async findAll(): Promise<User[]> {
     return await this.userRepository.find();
   }
 
@@ -42,7 +42,7 @@ export class UsersService {
     return userWithChannels.memberOfChannels;
   }
 
-  async findByEmail(email: string): Promise<User> {
+  public async findByEmail(email: string): Promise<User> {
     const user = await this.userRepository.findOneBy({ email });
 
     if (!user) {
@@ -53,14 +53,17 @@ export class UsersService {
     return user;
   }
 
-  async updateUser(user: User, fieldsToUpdate: UpdateUserDto): Promise<User> {
+  public async updateUser(
+    user: User,
+    fieldsToUpdate: UpdateUserDto,
+  ): Promise<User> {
     const newUser = this.userRepository.merge(user, fieldsToUpdate);
     await this.userRepository.save(newUser);
 
     return newUser;
   }
 
-  async create(userData: CreateUserDto) {
+  public async create(userData: CreateUserDto) {
     const newUser = this.userRepository.create({
       ...userData,
       name: userData.email,
@@ -79,7 +82,7 @@ export class UsersService {
     }
   }
 
-  async deleteUser(user: User) {
+  public async deleteUser(user: User) {
     const deletedUser = await this.userRepository.softRemove(user);
     this.logger.log(`User ${user.id} has been deleted`);
 

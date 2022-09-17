@@ -20,13 +20,15 @@
   - ~~authentication~~
   - ~~create **chanell** messaging~~
 
-- logging
-  - user module
-  - auth module
-  - channel module
-  - message module
+- ~~logging~~
+  - ~~user module~~
+  - ~~auth module~~
+  - ~~channel module~~
+  - ~~message module~~
 
 - write tests (ACL, Deletion)
+
+- add pagination
 
 - add message editing
 
@@ -36,12 +38,15 @@
 
 - deploy
 
+- migrate to Prisma
+
 - create **private** messaging
 
 - create private channels
 
 - add avatars
 
+- add invite links
 
 
 
