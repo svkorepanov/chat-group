@@ -41,8 +41,7 @@ export class Channel {
 
   @ManyToOne(() => User, (user) => user.ownerOfChannels, {
     cascade: ['insert', 'update'],
-    onDelete: 'NO ACTION',
-    nullable: false,
+    nullable: true,
   })
   @JoinColumn({ name: 'ownerId', referencedColumnName: 'id' })
   owner: User;

@@ -13,6 +13,7 @@ export class ChannelRepository extends Repository<Channel> {
     super(Channel, dataSource.createEntityManager());
   }
 
+  // TODO move this shit to service instead
   async saveChannel(entity: DeepPartial<Channel>, transaction?: EntityManager) {
     try {
       const channel = this.create(entity);

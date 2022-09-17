@@ -83,7 +83,7 @@ export class UsersService {
   }
 
   public async deleteUser(user: User) {
-    const deletedUser = await this.userRepository.softRemove(user);
+    const deletedUser = await this.userRepository.remove(user);
     this.logger.log(`User ${user.id} has been deleted`);
 
     return deletedUser;

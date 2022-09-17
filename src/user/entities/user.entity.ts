@@ -46,9 +46,15 @@ export class User {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @OneToMany(() => Channel, (channel) => channel.owner, { onDelete: 'CASCADE' })
+  @OneToMany(() => Channel, (channel) => channel.owner, {
+    cascade: ['insert', 'update'],
+    onDelete: 'SET NULL',
+  })
   ownerOfChannels: Channel[];
 
-  @OneToMany(() => ChannelMembers, (channelMembers) => channelMembers.member)
+  @OneToMany(() => ChannelMembers, (channelMembers) => channelMembers.member, {
+    cascade: ['insert', 'update'],
+    onDelete: 'CASCADE',
+  })
   memberOfChannels: ChannelMembers[];
 }
