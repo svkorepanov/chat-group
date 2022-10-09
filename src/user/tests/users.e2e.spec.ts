@@ -8,10 +8,10 @@ import { User } from '../entities/user.entity';
 import { faker } from '@faker-js/faker';
 import { AuthenticationModule } from '../../authentication/authentication.module';
 import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from '../../authentication/dto/jwt.dto';
 import { Channel } from '../../channels/entities/channel.entity';
 import { ChannelRepository } from '../../channels/entities/channel.repository';
 import { ChannelMembersRepository } from '../../channels/entities/channel-members.repository';
+import { UsersSeeder } from './users.seed';
 
 describe('UsersModule (e2e)', () => {
   let app: INestApplication;
@@ -19,11 +19,12 @@ describe('UsersModule (e2e)', () => {
   let channelRepository: ChannelRepository;
   let channelMembersRepository: ChannelMembersRepository;
   let jwtService: JwtService;
+  let usersSeeder: UsersSeeder;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [UsersModule, DataBaseModule, AuthenticationModule],
-      providers: [ChannelRepository, ChannelMembersRepository],
+      providers: [ChannelRepository, ChannelMembersRepository, UsersSeeder],
     }).compile();
 
     app = module.createNestApplication();
@@ -31,6 +32,7 @@ describe('UsersModule (e2e)', () => {
     channelRepository = module.get(ChannelRepository);
     channelMembersRepository = module.get(ChannelMembersRepository);
     jwtService = module.get(JwtService);
+    usersSeeder = module.get(UsersSeeder);
 
     await app.init();
   });
@@ -43,9 +45,9 @@ describe('UsersModule (e2e)', () => {
   // TODO: figure out how to scope users inside on suitcase
   describe.skip('(GET) /users', () => {
     it('success', async () => {
-      const [user1, user2] = await userRepository.save([
-        buildUser(),
-        buildUser(),
+      const [user1, user2] = await Promise.all([
+        usersSeeder.seedUser(),
+        usersSeeder.seedUser(),
       ]);
 
       const { body } = await request(app.getHttpServer())
@@ -61,8 +63,11 @@ describe('UsersModule (e2e)', () => {
 
   describe('(GET) /users/me', () => {
     it('success', async () => {
-      const [, user2] = await userRepository.save([buildUser(), buildUser()]);
-      const jwtToken = jwtService.sign(buildJwtPayload(user2));
+      const [, user2] = await Promise.all([
+        usersSeeder.seedUser(),
+        usersSeeder.seedUser(),
+      ]);
+      const jwtToken = jwtService.sign(usersSeeder.buildJwtPayload(user2));
 
       const { body } = await request(app.getHttpServer())
         .get('/users/me')
@@ -72,8 +77,11 @@ describe('UsersModule (e2e)', () => {
       expect(body).toEqual(expect.objectContaining({ email: user2.email }));
     });
     it('should not return password', async () => {
-      const [, user2] = await userRepository.save([buildUser(), buildUser()]);
-      const jwtToken = jwtService.sign(buildJwtPayload(user2));
+      const [, user2] = await Promise.all([
+        usersSeeder.seedUser(),
+        usersSeeder.seedUser(),
+      ]);
+      const jwtToken = jwtService.sign(usersSeeder.buildJwtPayload(user2));
 
       const { body } = await request(app.getHttpServer())
         .get('/users/me')
@@ -85,7 +93,7 @@ describe('UsersModule (e2e)', () => {
     });
 
     it('Unauthorized', async () => {
-      await userRepository.save([buildUser(), buildUser()]);
+      await Promise.all([usersSeeder.seedUser(), usersSeeder.seedUser()]);
 
       await request(app.getHttpServer()).get('/users/me').expect(401);
     });
@@ -93,11 +101,11 @@ describe('UsersModule (e2e)', () => {
 
   describe('(GET) /users/:id', () => {
     it('success', async () => {
-      const [user1, user2] = await userRepository.save([
-        buildUser(),
-        buildUser(),
+      const [user1, user2] = await Promise.all([
+        usersSeeder.seedUser(),
+        usersSeeder.seedUser(),
       ]);
-      const jwtToken = jwtService.sign(buildJwtPayload(user2));
+      const jwtToken = jwtService.sign(usersSeeder.buildJwtPayload(user2));
 
       const { body } = await request(app.getHttpServer())
         .get(`/users/${user1.id}`)
@@ -108,7 +116,7 @@ describe('UsersModule (e2e)', () => {
     });
 
     it('Unauthorized', async () => {
-      await userRepository.save([buildUser(), buildUser()]);
+      await Promise.all([usersSeeder.seedUser(), usersSeeder.seedUser()]);
 
       await request(app.getHttpServer()).get('/users/id').expect(401);
     });
@@ -116,8 +124,11 @@ describe('UsersModule (e2e)', () => {
 
   describe('(PATCH) /users/me', () => {
     it('success', async () => {
-      const [, user2] = await userRepository.save([buildUser(), buildUser()]);
-      const jwtToken = jwtService.sign(buildJwtPayload(user2));
+      const [, user2] = await Promise.all([
+        usersSeeder.seedUser(),
+        usersSeeder.seedUser(),
+      ]);
+      const jwtToken = jwtService.sign(usersSeeder.buildJwtPayload(user2));
 
       const userUpdateBody = {
         bio: 'new bio',
@@ -135,8 +146,11 @@ describe('UsersModule (e2e)', () => {
     });
 
     it('should reject excessive properties in body', async () => {
-      const [, user2] = await userRepository.save([buildUser(), buildUser()]);
-      const jwtToken = jwtService.sign(buildJwtPayload(user2));
+      const [, user2] = await Promise.all([
+        usersSeeder.seedUser(),
+        usersSeeder.seedUser(),
+      ]);
+      const jwtToken = jwtService.sign(usersSeeder.buildJwtPayload(user2));
 
       const userUpdateBody = {
         name: 'new name',
@@ -150,8 +164,11 @@ describe('UsersModule (e2e)', () => {
     });
 
     it('should reject invalid properties', async () => {
-      const [, user2] = await userRepository.save([buildUser(), buildUser()]);
-      const jwtToken = jwtService.sign(buildJwtPayload(user2));
+      const [, user2] = await Promise.all([
+        usersSeeder.seedUser(),
+        usersSeeder.seedUser(),
+      ]);
+      const jwtToken = jwtService.sign(usersSeeder.buildJwtPayload(user2));
 
       const userUpdateBody = {
         name: '',
@@ -166,7 +183,7 @@ describe('UsersModule (e2e)', () => {
     });
 
     it('Unauthorized', async () => {
-      await userRepository.save([buildUser(), buildUser()]);
+      await Promise.all([usersSeeder.seedUser(), usersSeeder.seedUser()]);
       const userUpdateBody = {
         name: 'new name',
         whiteListedProp: 'should be rejected',
@@ -180,8 +197,11 @@ describe('UsersModule (e2e)', () => {
 
   describe('(DELETE) /users/me', () => {
     it('success', async () => {
-      const [, user2] = await userRepository.save([buildUser(), buildUser()]);
-      const jwtToken = jwtService.sign(buildJwtPayload(user2));
+      const [, user2] = await Promise.all([
+        usersSeeder.seedUser(),
+        usersSeeder.seedUser(),
+      ]);
+      const jwtToken = jwtService.sign(usersSeeder.buildJwtPayload(user2));
 
       const { body } = await request(app.getHttpServer())
         .delete('/users/me')
@@ -194,8 +214,11 @@ describe('UsersModule (e2e)', () => {
       expect(user).toBeFalsy();
     });
     it('should be removed from owner of a channel', async () => {
-      const [, user2] = await userRepository.save([buildUser(), buildUser()]);
-      const jwtToken = jwtService.sign(buildJwtPayload(user2));
+      const [, user2] = await Promise.all([
+        usersSeeder.seedUser(),
+        usersSeeder.seedUser(),
+      ]);
+      const jwtToken = jwtService.sign(usersSeeder.buildJwtPayload(user2));
       const channel = await channelRepository.save(buildChannel(user2));
 
       const { body } = await request(app.getHttpServer())
@@ -216,11 +239,11 @@ describe('UsersModule (e2e)', () => {
     });
 
     it('should be removed from members of a channel', async () => {
-      const [user1, user2] = await userRepository.save([
-        buildUser(),
-        buildUser(),
+      const [user1, user2] = await Promise.all([
+        usersSeeder.seedUser(),
+        usersSeeder.seedUser(),
       ]);
-      const jwtToken = jwtService.sign(buildJwtPayload(user2));
+      const jwtToken = jwtService.sign(usersSeeder.buildJwtPayload(user2));
 
       const channel = await channelRepository.save(buildChannel(user1));
       await channelMembersRepository.save([
@@ -259,31 +282,12 @@ describe('UsersModule (e2e)', () => {
     });
 
     it('Unauthorized', async () => {
-      await userRepository.save([buildUser(), buildUser()]);
+      await Promise.all([usersSeeder.seedUser(), usersSeeder.seedUser()]);
 
       await request(app.getHttpServer()).delete('/users/me').expect(401);
     });
   });
 });
-
-function buildUser(ovverrides: Partial<User> = {}): User {
-  const user = new User();
-  user.email = faker.internet.email();
-  user.password = faker.internet.password();
-  user.name = faker.name.firstName();
-  user.bio = faker.lorem.sentence(10);
-  user.phone = faker.phone.number('###########');
-
-  Object.entries(ovverrides).forEach(([key, value]) => {
-    user[key] = value;
-  });
-
-  return user;
-}
-
-function buildJwtPayload(user: User): JwtPayload {
-  return { username: user.name, sub: user.id };
-}
 
 function buildChannel(owner: User) {
   const channel = new Channel();

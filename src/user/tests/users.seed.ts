@@ -1,11 +1,12 @@
 import { faker } from '@faker-js/faker';
 import { Injectable } from '@nestjs/common';
 import { DataSource, EntityManager } from 'typeorm';
+import { JwtPayload } from '../../authentication/dto/jwt.dto';
 import { User } from '../entities/user.entity';
 
 @Injectable()
 export class UsersSeeder {
-  entityManager: EntityManager;
+  private entityManager: EntityManager;
 
   constructor(dataSource: DataSource) {
     this.entityManager = dataSource.createEntityManager();
@@ -26,5 +27,9 @@ export class UsersSeeder {
       phone: faker.phone.number('###########'),
       ...ovverrides,
     });
+  }
+
+  public buildJwtPayload(user: User): JwtPayload {
+    return { username: user.name, sub: user.id };
   }
 }
