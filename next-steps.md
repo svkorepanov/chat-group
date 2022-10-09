@@ -28,7 +28,7 @@
 
 - write tests (ACL, Deletion)
   - ~~users controller~~
-  - authorization controller
+  - ~~authorization controller~~
   - channels controller
 
 - debug nodejs - use profiler.
