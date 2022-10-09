@@ -27,14 +27,19 @@
   - ~~message module~~
 
 - write tests (ACL, Deletion)
+  - ~~users controller~~
+  - authorization controller
+  - channels controller
 
-- add pagination
+- debug nodejs - use profiler.
+
+- add pagination to users and all list data
 
 - add message editing
 
 - add authorization for (channel deletion, message editing)
 
-- create front end
+- **create front end**
 
 - deploy
 
