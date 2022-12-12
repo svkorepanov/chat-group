@@ -30,6 +30,7 @@
   - ~~users controller~~
   - ~~authorization controller~~
   - channels controller
+  - channels-gateway
 
 - debug nodejs - use profiler.
 
@@ -43,7 +44,7 @@
 
 - deploy
 
-- migrate to Prisma
+- migrate to Sequelise
 
 - create **private** messaging
 

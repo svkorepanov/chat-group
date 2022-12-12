@@ -23,7 +23,7 @@ export class Channel {
   @Column({ length: 50 })
   name: string;
 
-  @Column({ length: 240 })
+  @Column({ length: 240, nullable: true })
   description: string;
 
   @CreateDateColumn()
@@ -36,7 +36,7 @@ export class Channel {
   version: number;
 
   @Exclude()
-  @DeleteDateColumn()
+  @DeleteDateColumn({ nullable: true })
   deletedAt: Date;
 
   @ManyToOne(() => User, (user) => user.ownerOfChannels, {
@@ -46,7 +46,9 @@ export class Channel {
   @JoinColumn({ name: 'ownerId', referencedColumnName: 'id' })
   owner: User;
 
-  @OneToMany(() => ChannelMembers, (channelMembers) => channelMembers.channel)
+  @OneToMany(() => ChannelMembers, (channelMembers) => channelMembers.channel, {
+    cascade: ['soft-remove'],
+  })
   members: ChannelMembers[];
 
   @OneToMany(() => Message, (message) => message.channel)

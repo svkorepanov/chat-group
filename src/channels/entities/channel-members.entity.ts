@@ -21,13 +21,13 @@ export class ChannelMembers {
   channelId: number;
 
   @ManyToOne(() => Channel, (channel) => channel.members, {
-    cascade: false,
     onDelete: 'NO ACTION',
   })
   @JoinColumn({ name: 'channelId', referencedColumnName: 'id' })
   channel: Channel;
 
   @ManyToOne(() => User, (user) => user.memberOfChannels, {
+    cascade: false,
     onDelete: 'NO ACTION',
   })
   @JoinColumn({ name: 'userId', referencedColumnName: 'id' })

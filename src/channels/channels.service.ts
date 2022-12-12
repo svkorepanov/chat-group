@@ -1,10 +1,12 @@
 import {
+  ConflictException,
   ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
+import { PgErrorCodes } from '../constants/postgres';
 import { MessagesService } from '../messages/messages.service';
 import { User } from '../user/entities/user.entity';
 import { CreateChannelMessageDto } from './dto/create-channel-message.dto';
@@ -43,17 +45,19 @@ export class ChannelsService {
   }
 
   async join(id: number, user: User): Promise<void> {
+    const channel = await this.findOne(id);
     await this.channelMembersRepository.save({
       userId: user.id,
-      channelId: id,
+      channelId: channel.id,
     });
     this.logger.log(`User ${user.id} has joined channel ${id}`);
   }
 
   async leave(id: number, user: User): Promise<void> {
+    const channel = await this.findOne(id);
     await this.channelMembersRepository.softRemove({
       userId: user.id,
-      channelId: id,
+      channelId: channel.id,
     });
     this.logger.log(`User ${user.id} has left channel ${id}`);
   }
@@ -83,7 +87,7 @@ export class ChannelsService {
       await queryRunner.commitTransaction();
 
       this.logger.log(
-        `User ${owner.id} has created channel ${newChannelInstance.id}`,
+        `User ${owner.id} has created the channel ${newChannelInstance.id}`,
       );
 
       return newChannelInstance;
@@ -126,11 +130,21 @@ export class ChannelsService {
       throw new ForbiddenException();
     }
     const newChannel = this.channelRepository.merge(channel, updateChannelDto);
-    return await this.channelRepository.saveChannel(newChannel);
+    try {
+      const savedChannel = await this.channelRepository.saveChannel(newChannel);
+      return savedChannel;
+    } catch (error) {
+      if (error?.code === PgErrorCodes.UniqueViolation) {
+        throw new ConflictException(
+          `Channel with name '${newChannel.name}' alread exists`,
+        );
+      }
+      throw error;
+    }
   }
 
   async remove(id: number, user: User): Promise<Channel> {
-    const channel = await this.findOne(id);
+    const channel = await this.findOne(id, true);
     if (channel.owner.id !== user.id) {
       throw new ForbiddenException();
     }

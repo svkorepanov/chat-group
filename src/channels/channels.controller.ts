@@ -12,6 +12,8 @@ import {
   ClassSerializerInterceptor,
   UseInterceptors,
   ParseIntPipe,
+  HttpStatus,
+  HttpCode,
 } from '@nestjs/common';
 import { GetUser } from '../authentication/decorators/user-request.decorator';
 import { JwtAuthGuard } from '../authentication/guards/jwt-auth.guard';
@@ -48,13 +50,21 @@ export class ChannelsController {
     return this.channelsService.create(user, createChannelDto);
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Post(':id/join')
-  joinChannel(@Param('id', ParseIntPipe) id: number, @GetUser() user: User) {
+  joinChannel(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: User,
+  ): Promise<void> {
     return this.channelsService.join(id, user);
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Post(':id/leave')
-  leaveChannel(@Param('id', ParseIntPipe) id: number, @GetUser() user: User) {
+  leaveChannel(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: User,
+  ): Promise<void> {
     return this.channelsService.leave(id, user);
   }
 
