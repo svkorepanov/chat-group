@@ -24,7 +24,7 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+**Part of the implentation of the dev challenge [devchallenges.io](https://devchallenges.io/challenges/UgCqszKR7Q7oqb4kRfI0)**
 
 ## Installation
 
